@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Application</title>
+    <link href="https://fonts.googleapis.com/css?family=Poppins" rel="stylesheet" />
+    <link href="./_chat.css" rel="stylesheet">
+    <link href="./_mini-reset.css" rel="stylesheet">
+    <link href="./cat-page.css" rel="stylesheet">
+
+</head>
+
+<body>
+    <!-- https://socket.io/docs/v4/client-installation/ -->
+    <div id="join-chat-div">
+        <label>Enter Your Name</label>
+        <input id="userInp" type="text">
+        <button id="joinBtn">Join Chat</button>
+    </div>
+    <div class="chat-app">
+        <div class="chat-app__header">
+            <h2>Cat Chat</h2>
+        </div>
+        <div class="chat-app__content">
+            <form class="user-form" onsubmit="sendMessage(event)">
+                <label for="user-input" class="user-form-label"></label>
+                <input name="user-input" id="user-input" class="user-form--input" placeholder="Type your message" />
+                <button class="user-form-button">Send</button>
+            </form>
+            <div class="conversation">
+                <div id="conversation-container" class="conversation-container">
+                    <!-- <div class="message user"><span>(Message Sent cat)</span></div>
+                    <div class="message"><span>hii(Message Received)</span></div> -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"
+        integrity="sha384-Gr6Lu2Ajx28mzwyVR8CFkULdCU7kMlZ9UthllibdOSo6qAiN+yXNHqtgdTvFXMT4"
+        crossorigin="anonymous"></script>
+    <!-- <script src="/socket.io/socket.io.js"></script> -->
+    <!-- <script src="script.js"></script> -->
+    <script>
+        const socket = io();
+        const input = document.getElementById('user-input');
+        const sendBtt = document.querySelector('.user-form-button');
+        const conversationContainer = document.getElementById("conversation-container");
+        const userDiv = document.querySelector(".user");
+        const joinBtn = document.querySelector("#joinBtn");
+        const userInp = document.querySelector("#userInp");
+        let username = "";
+        const joinChat = document.querySelector("#join-chat-div");
+        const chatApp = document.querySelector(".chat-app");
+        const userinputMessage = document.querySelector("#user-input")
+
+       
+        joinBtn.addEventListener("click", ((e) => {
+            e.preventDefault()
+            username = userInp.value;
+
+            if (username) {
+                joinChat.style.display = "none";
+                chatApp.style.display = "block";
+            }
+
+        }));
+        
+        sendBtt.addEventListener("click", ((e) => {
+            e.preventDefault();
+
+            let data ={
+                id: socket.id,
+                username: username,
+                message : userinputMessage.value
+            }
+            socket.emit("message event",data);
+            renderMessage(data, "SENT")
+            console.log(data)
+        }));
+        socket.on("message event", (data)=>{
+            if(socket.id !== data.id) {
+                renderMessage(data, "Receive");
+            }
+            console.log(data);
+
+        })
+        function renderMessage(data,typeofMSG) {
+            const div = document.createElement("div");
+            div.innerHTML = `<span>${data.username} : ${data.message}</span>`
+
+            if(typeofMSG === "SENT"){
+                div.classList.add("message", "user");
+
+            } else {
+                div.classList.add("message", "cat");
+                    
+            }
+            conversationContainer.append(div);
+                userinputMessage.value =""
+            
+        }
+
+    </script>
+</body>
+
+</html>

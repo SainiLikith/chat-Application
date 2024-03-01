@@ -5,16 +5,19 @@ const express = require("express");
 const http = require("http");
 // import socket.io
 const socketIO = require("socket.io");
-const PORT = 8000;
+const PORT = process.env.PORT || 8000;
 
 
 
 // create express server
 const expressServer = express();
-// expressServer.use((req,res)=>{
-//     console.log("hey --> This is a middleware");
-//     res.send("hey")
-// });
+expressServer.use((req,res,next)=>{
+    console.log("hey --> This is a middleware");
+    
+    res.data = "heyy"
+    next();
+    
+});
 
 
 // body:"{obj"

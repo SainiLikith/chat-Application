@@ -24,7 +24,7 @@
             <h2>Cat Chat</h2>
         </div>
         <div class="chat-app__content">
-            <form class="user-form" onsubmit="sendMessage(event)">
+            <form class="user-form" >
                 <label for="user-input" class="user-form-label"></label>
                 <input name="user-input" id="user-input" class="user-form--input" placeholder="Type your message" />
                 <button class="user-form-button">Send</button>
@@ -70,6 +70,7 @@
         
         sendBtt.addEventListener("click", ((e) => {
             e.preventDefault();
+            e.stopPropagation();
 
             let data ={
                 id: socket.id,
@@ -77,8 +78,12 @@
                 message : userinputMessage.value
             }
             socket.emit("message event",data);
-            renderMessage(data, "SENT")
-            console.log(data)
+            if (data.message) {
+                renderMessage(data, "SENT");
+            }
+
+
+            console.log(data);
         }));
         socket.on("message event", (data)=>{
             if(socket.id !== data.id) {
